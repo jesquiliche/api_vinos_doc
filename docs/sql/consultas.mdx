@@ -1,0 +1,374 @@
+---
+sidebar_position: 9
+---
+
+# Consultas avanzadas
+
+## JOIN, GROUP BY Y HAVING
+
+Las consultas avanzadas en SQL permiten obtener información más específica y detallada de una o varias tablas de una base de datos relacional. Algunas de las consultas más comunes son:
+
+- JOIN: Permite combinar filas de dos o más tablas en base a una columna en común. Se pueden realizar diferentes tipos de JOIN, como INNER JOIN, LEFT JOIN, RIGHT JOIN, entre otros.
+```
+SELECT *
+FROM tabla1
+INNER JOIN tabla2 ON tabla1.columna_comun = tabla2.columna_comun;
+```
+- GROUP BY: Agrupa las filas que tienen el mismo valor en una o varias columnas específicas, permitiendo realizar operaciones de agregación como COUNT, SUM o AVG.
+```
+SELECT columna, COUNT(*)
+FROM tabla
+GROUP BY columna;
+```
+- HAVING: Es una cláusula que se utiliza en conjunto con GROUP BY, permitiendo filtrar el resultado de la consulta en base a una condición en la columna agregada.
+```
+SELECT columna, COUNT(*)
+FROM tabla
+GROUP BY columna
+HAVING COUNT(*) > 1;
+```
+
+En Eloquent, se pueden realizar estas consultas avanzadas utilizando los métodos de Query Builder, que permiten construir consultas SQL utilizando una sintaxis similar a la de Eloquent.
+
+- JOIN: Se utiliza el método join() para combinar tablas y especificar las columnas en común.
+```
+DB::table('tabla1')
+   ->join('tabla2', 'tabla1.columna_comun', '=', 'tabla2.columna_comun')
+   ->select('*')
+   ->get();
+```
+- GROUP BY: Se utiliza el método groupBy() para agrupar por una o varias columnas específicas.
+```
+DB::table('tabla')
+   ->select('columna', DB::raw('COUNT(*) as count'))
+   ->groupBy('columna')
+   ->get();
+```
+- HAVING: Se utiliza el método having() para filtrar el resultado de la consulta en base a una columna agregada.
+```
+DB::table('tabla')
+   ->select('columna', DB::raw('COUNT(*) as count'))
+   ->groupBy('columna')
+   ->having('count', '>', 1)
+   ->get();
+```
+
+En cuanto a similitudes y diferencias entre las consultas avanzadas en SQL y Eloquent, 
+ambas utilizan la misma lógica y sintaxis en cuanto a 
+JOIN, GROUP BY y HAVING. Sin embargo, en Eloquent se utilizan 
+métodos específicos para cada una de estas operaciones, 
+lo que puede resultar más fácil de comprender y escribir. Además, 
+Eloquent proporciona una capa de abstracción sobre SQL, lo que 
+permite que las consultas sean más fáciles de leer y mantener. 
+Por otro lado, SQL permite una mayor flexibilidad y complejidad en 
+cuanto a la construcción de consultas, permitiendo el uso de 
+subconsultas y otras funcionalidades avanzadas que pueden ser necesarias 
+en casos específicos.
+
+## Paginación
+
+### Paginación en SQL
+
+En SQL, la paginación se puede lograr utilizando la cláusula `LIMIT` y `OFFSET`. La cláusula `LIMIT` se utiliza para limitar el número de filas devueltas en una consulta, mientras que `OFFSET` se utiliza para especificar el número de filas que se deben saltar antes de comenzar a devolver resultados. 
+
+Por ejemplo, si quisieras devolver las filas 11 a 20 de una tabla `productos` en orden ascendente por precio, podrías hacerlo de la siguiente manera:
+
+```
+SELECT * FROM productos ORDER BY precio ASC LIMIT 10 OFFSET 10;
+```
+
+Esta consulta devuelve un máximo de 10 filas (`LIMIT 10`) comenzando desde la fila 11 (`OFFSET 10`) en la tabla `productos`, ordenadas por el precio ascendente.
+
+En algunos sistemas de bases de datos, la cláusula `OFFSET` puede ser reemplazada por la cláusula `FETCH`, que proporciona una forma más intuitiva de paginar los resultados.
+
+```
+SELECT * FROM productos ORDER BY precio ASC OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY;
+```
+
+Esta consulta es equivalente a la anterior, pero utiliza la cláusula `FETCH` en lugar de `OFFSET`.
+
+Es importante destacar que la sintaxis de paginación varía según el sistema de base de datos que se esté utilizando, y algunos sistemas de base de datos pueden tener formas más complejas de realizar la paginación.
+
+Sin embargo, en general, la paginación en SQL es una tarea relativamente sencilla y puede ser realizada por cualquier programador SQL experimentado.
+
+### Paginación Eloquent
+
+En Eloquent, se puede realizar paginación utilizando el método `paginate()` que devuelve una instancia de `Illuminate\Pagination\LengthAwarePaginator`. Este método acepta un argumento que representa el número de elementos que se deben mostrar por página.
+
+Supongamos que tenemos un modelo `Product` con los campos `id`, `name`, `description` y `price`. Para paginar los resultados de una consulta que obtiene todos los productos, podemos hacer lo siguiente:
+
+```
+$products = App\Product::paginate(10);
+```
+
+Este código paginará los resultados en grupos de 10 elementos por página. Para mostrar los elementos de la página actual, podemos utilizar el método `links()` del objeto `LengthAwarePaginator`, como se muestra a continuación:
+
+```
+{{ $products->links() }}
+```
+
+Este código generará un conjunto de enlaces de paginación que permiten al usuario navegar entre las diferentes páginas de resultados.
+
+Además, el método `paginate()` también acepta un segundo argumento opcional que representa el número de página que se debe mostrar inicialmente. Por ejemplo, para mostrar la tercera página de resultados, podemos hacer lo siguiente:
+
+```
+$products = App\Product::paginate(10, 3);
+```
+
+También podemos agregar condiciones a la consulta utilizando métodos como `where()`, `orWhere()`, `orderBy()`, entre otros. Por ejemplo, para obtener los productos con un precio mayor a 100 ordenados por nombre, podemos hacer lo siguiente:
+
+```
+$products = App\Product::where('price', '>', 100)
+                ->orderBy('name')
+                ->paginate(10);
+``` 
+
+Este código paginará los resultados que cumplan con la condición `price > 100` y los ordenará alfabéticamente por `name`.
+
+### Páginacion en ORACLE
+
+La paginación en Oracle se puede lograr utilizando la cláusula `ROWNUM` en la consulta SQL. Por ejemplo, para obtener los primeros 10 registros de una tabla llamada `users`, se podría hacer lo siguiente:
+
+```sql
+SELECT * 
+FROM (
+    SELECT u.*, ROWNUM r 
+    FROM users u 
+    WHERE ROWNUM <= 10
+)
+WHERE r >= 1
+```
+
+En este ejemplo, se utiliza una subconsulta que incluye la tabla `users` y la columna virtual `ROWNUM`. La condición `WHERE ROWNUM <= 10` limita la subconsulta a los primeros 10 registros. Luego, la consulta principal filtra los registros con `r >= 1`, que es el primer registro de la subconsulta.
+
+Cabe destacar que, en Oracle, la cláusula `ROWNUM` se aplica antes de la ordenación. 
+Si se desea una paginación ordenada, es necesario utilizar otra 
+subconsulta para aplicar la ordenación antes de la paginación.
+
+### Páginación en SQL Server
+
+Para realizar paginación en SQL Server, se puede utilizar la cláusula `OFFSET` y `FETCH NEXT`, que permiten especificar el número de registros a saltar y el número de registros a devolver.
+
+Por ejemplo, para devolver los 10 registros siguientes después de los primeros 20 registros de una tabla `usuarios`, se puede usar la siguiente consulta:
+
+```sql
+SELECT *
+FROM usuarios
+ORDER BY id
+OFFSET 20 ROWS
+FETCH NEXT 10 ROWS ONLY
+```
+
+Esta consulta ordena los registros por el campo `id`, salta los primeros 20 registros y devuelve los siguientes 10 registros.
+
+Es importante tener en cuenta que la cláusula `OFFSET` y `FETCH NEXT` requiere que la tabla tenga una columna que pueda usarse para ordenar los registros. Si la tabla no tiene una columna adecuada para el ordenamiento, se pueden usar subconsultas o expresiones comunes de tabla para realizar la paginación.
+
+También es posible utilizar la función `ROW_NUMBER()` para enumerar los registros y luego aplicar la cláusula `OFFSET` y `FETCH NEXT` a los números de fila. Por ejemplo:
+
+```sql
+SELECT *
+FROM (
+  SELECT ROW_NUMBER() OVER (ORDER BY id) AS rownum, *
+  FROM usuarios
+) AS sub
+WHERE rownum > 20
+  AND rownum <= 30
+```
+
+Esta consulta enumera los registros de la tabla `usuarios` por el campo `id` y luego selecciona los registros con números de fila entre 20 y 30.
+
+En conclusión, la paginación en SQL Server se puede realizar 
+mediante la cláusula `OFFSET` y `FETCH NEXT`, o mediante la función `ROW_NUMBER()` junto con la cláusula `OFFSET` y `FETCH NEXT`.
+
+### Paginación en MySQL
+
+En MySQL, la paginación se puede lograr utilizando la cláusula `LIMIT`. Por ejemplo, para obtener los primeros 10 registros de una tabla llamada `users`, se podría hacer lo siguiente:
+
+```sql
+SELECT * FROM users LIMIT 10
+```
+
+Esta consulta devolverá los primeros 10 registros de la tabla `users`. Para obtener los siguientes 10 registros, se puede usar la cláusula `OFFSET`:
+
+```sql
+SELECT * FROM users LIMIT 10 OFFSET 10
+```
+
+Esta consulta devolverá los siguientes 10 registros después de los primeros 10. El número pasado a la cláusula `OFFSET` indica cuántos registros se deben omitir antes de empezar a devolver registros.
+
+Cabe destacar que, en MySQL, la cláusula `LIMIT` se puede utilizar en combinación con la cláusula `ORDER BY` para paginar registros ordenados. Por ejemplo:
+
+```sql
+SELECT * FROM users ORDER BY created_at DESC LIMIT 10 OFFSET 10
+```
+
+Esta consulta devolverá los siguientes 10 registros ordenados por la columna `created_at` de manera descendente.
+
+### Paginación en PostgreSQL
+
+En PostgreSQL, la paginación se puede lograr utilizando la cláusula `LIMIT` y la cláusula `OFFSET`. La cláusula `LIMIT` se utiliza para limitar el número de filas devueltas por la consulta, mientras que la cláusula `OFFSET` se utiliza para especificar el número de filas que se deben omitir antes de comenzar a devolver las filas.
+
+Por ejemplo, si queremos mostrar los resultados de la página 2 de una consulta que muestra 10 resultados por página, podemos usar la siguiente consulta:
+
+```
+SELECT * FROM mi_tabla
+ORDER BY columna
+LIMIT 10 OFFSET 10;
+```
+
+Esto devolverá las filas 11 a 20 de la tabla, ordenadas por la columna especificada.
+
+En Eloquent, la paginación se logra mediante el método `paginate()`. Este método toma un argumento opcional que especifica el número de resultados que se deben mostrar por página y devuelve una instancia de la clase `Illuminate\Pagination\LengthAwarePaginator`.
+
+Por ejemplo, para paginar una consulta en Eloquent y mostrar 10 resultados por página, podemos usar el siguiente código:
+
+```
+$resultados = DB::table('mi_tabla')
+                ->orderBy('columna')
+                ->paginate(10);
+```
+
+Esto devolverá los primeros 10 resultados de la consulta y creará una instancia de `LengthAwarePaginator` que se puede utilizar para mostrar los resultados de la página actual, así como los enlaces a 
+las páginas anteriores y siguientes.
+
+### Otros métodos de paginación en Eloquent
+
+Además del método `paginate()`, Eloquent también proporciona otros métodos para la paginación de resultados:
+
+1. `simplePaginate()`: Este método funciona de manera similar a `paginate()`, pero en lugar de proporcionar la información de paginación completa, solo devuelve los resultados de la página actual y los enlaces a la página anterior y siguiente.
+
+2. `onEachSide($value)`: Este método se utiliza para especificar el número de enlaces de página que se mostrarán a cada lado de la página actual en la vista de paginación. Por defecto, el valor es 3.
+
+3. `setPath($path)`: Este método se utiliza para especificar la URL base de los enlaces de paginación. Por defecto, Eloquent utiliza la URL actual de la solicitud.
+
+4. `appends($key, $value)`: Este método se utiliza para agregar parámetros de consulta adicionales a los enlaces de paginación. Esto puede ser útil cuando se filtran los resultados de una consulta y se desea mantener esos filtros en la paginación.
+
+A continuación, se muestra un ejemplo de cómo utilizar `simplePaginate()` en Eloquent:
+
+```
+$users = User::where('status', 'active')->simplePaginate(10);
+```
+
+Este ejemplo devolverá los usuarios 
+activos en paquetes de 10 resultados, 
+junto con los enlaces a la página anterior y siguiente.
+
+## SUM,MAX,MIN y AVG
+
+En SQL, SUM, MAX, MIN y AVG son funciones de agregado que se utilizan para realizar cálculos en las columnas de una tabla. 
+
+La función SUM se utiliza para calcular la suma de los valores en una columna determinada, mientras que la función MAX devuelve el valor máximo en una columna determinada. Por otro lado, la función MIN devuelve el valor mínimo en una columna, y la función AVG se utiliza para calcular el promedio de los valores en una columna.
+
+Estas funciones pueden ser útiles en una variedad de situaciones, como para calcular la cantidad total de ventas en una tabla de ventas, el precio máximo de un producto en una tabla de productos, el precio mínimo de un producto en una tabla de productos, o el promedio de los sueldos de los empleados en una tabla de empleados.
+
+Es importante tener en cuenta que estas funciones de agregado se utilizan junto con la cláusula GROUP BY para agrupar los datos según una o más columnas. También se pueden utilizar en combinación con otras funciones y cláusulas SQL para realizar cálculos más complejos y 
+obtener información más detallada de la base de datos.
+
+### Ejemplos
+
+
+
+- SUM: esta función se utiliza para sumar los valores de una columna en una tabla.
+
+Ejemplo:
+
+Supongamos que tenemos una tabla de ventas y queremos obtener el total de ventas realizadas:
+
+```
+SELECT SUM(monto) AS total_ventas FROM ventas;
+```
+
+- MAX: esta función se utiliza para obtener el valor máximo de una columna en una tabla.
+
+Ejemplo:
+
+Supongamos que tenemos una tabla de productos y queremos obtener el precio más alto de todos los productos:
+
+```
+SELECT MAX(precio) AS precio_maximo FROM productos;
+```
+
+- MIN: esta función se utiliza para obtener el valor mínimo de una columna en una tabla.
+
+Ejemplo:
+
+Supongamos que tenemos una tabla de empleados y queremos obtener el salario mínimo de todos los empleados:
+
+```
+SELECT MIN(salario) AS salario_minimo FROM empleados;
+```
+
+- AVG: esta función se utiliza para obtener el promedio de una columna en una tabla.
+
+Ejemplo:
+
+Supongamos que tenemos una tabla de calificaciones y queremos obtener el promedio de las calificaciones obtenidas:
+
+```
+SELECT AVG(calificacion) AS promedio_calificaciones FROM calificaciones;
+```
+
+Es importante tener en cuenta que estas funciones de agregación 
+pueden ser combinadas con otras cláusulas de SQL para realizar 
+consultas más complejas y específicas.
+
+### SUM,MAX,MIN y AVG en Eloquent
+
+En Eloquent, puedes usar los métodos `sum()`, `max()`, `min()` y `avg()` para calcular la suma, el máximo, el mínimo y el promedio de una columna en una tabla, respectivamente.
+
+Por ejemplo, para calcular la suma de una columna en una tabla, puedes hacer lo siguiente:
+
+```php
+$total = DB::table('tabla')->sum('columna');
+```
+
+Donde `tabla` es el nombre de la tabla y `columna` es el nombre de la columna que quieres sumar. El método `sum()` devuelve el total de la suma como un valor numérico.
+
+De manera similar, para obtener el valor máximo de una columna, puedes usar el método `max()`:
+
+```php
+$maximo = DB::table('tabla')->max('columna');
+```
+
+Para obtener el valor mínimo de una columna, puedes usar el método `min()`:
+
+```php
+$minimo = DB::table('tabla')->min('columna');
+```
+
+Y para calcular el promedio de una columna, puedes usar el método `avg()`:
+
+```php
+$promedio = DB::table('tabla')->avg('columna');
+```
+
+En todos los casos, `tabla` es el nombre de la tabla y `columna` es el nombre de la columna que deseas consultar. Los métodos `max()`, `min()` y `avg()` también devuelven valores numéricos.
+
+## Ejemplos de instrucciones SQL y su correpondiente en Eloquent
+
+1. Instrucción SQL: COUNT
+   - La instrucción COUNT se utiliza para contar el número de filas en una tabla.
+   - Ejemplo: `SELECT COUNT(*) FROM users WHERE age > 18;`
+   - Equivalente en Eloquent: `$count = User::where('age', '>', 18)->count();`
+
+2. Instrucción SQL: ORDER BY
+   - La instrucción ORDER BY se utiliza para ordenar los resultados de una consulta por una o varias columnas en orden ascendente o descendente.
+   - Ejemplo: `SELECT * FROM users ORDER BY name ASC, age DESC;`
+   - Equivalente en Eloquent: `$users = User::orderBy('name')->orderBy('age', 'desc')->get();`
+
+3. Instrucción SQL: LIMIT y OFFSET
+   - La instrucción LIMIT se utiliza para limitar el número de resultados de una consulta, mientras que la instrucción OFFSET se utiliza para saltar un número determinado de resultados antes de comenzar a mostrarlos.
+   - Ejemplo: `SELECT * FROM users LIMIT 10 OFFSET 20;`
+   - Equivalente en Eloquent: `$users = User::skip(20)->take(10)->get();`
+
+4. Instrucción SQL: DISTINCT
+   - La instrucción DISTINCT se utiliza para seleccionar valores únicos de una columna determinada.
+   - Ejemplo: `SELECT DISTINCT country FROM users;`
+   - Equivalente en Eloquent: `$countries = User::distinct()->pluck('country');`
+
+5. Instrucción SQL: JOIN
+   - La instrucción JOIN se utiliza para combinar datos de dos o más tablas relacionadas en una sola consulta.
+   - Ejemplo: `SELECT users.name, orders.order_number FROM users INNER JOIN orders ON users.id = orders.user_id;`
+   - Equivalente en Eloquent: `$users = User::join('orders', 'users.id', '=', 'orders.user_id')->select('users.name', 'orders.order_number')->get();`
+
+Estos son solo algunos ejemplos, pero Eloquent proporciona una amplia gama de métodos para realizar consultas complejas a la base de datos.

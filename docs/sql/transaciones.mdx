@@ -1,0 +1,76 @@
+---
+sidebar_position: 11
+---
+
+# Transacciones
+
+En el contexto de las bases de datos, una transacción es una secuencia de operaciones que se realizan como una sola unidad atómica e indivisible, es decir, o se completan todas las operaciones o no se realiza ninguna. Las transacciones son importantes porque permiten garantizar la integridad de los datos en una base de datos, especialmente en situaciones en las que varias operaciones deben realizarse como una única unidad lógica.
+
+Por ejemplo, supongamos que un usuario desea transferir fondos de una cuenta bancaria a otra cuenta. La transferencia de fondos consta de varias operaciones, como verificar la disponibilidad de fondos, deducir los fondos de una cuenta y agregar los fondos a otra cuenta. Si se produce un error en una de estas operaciones, es necesario revertir todas las operaciones anteriores y garantizar que no se realice ninguna operación adicional. Las transacciones permiten garantizar que se realicen todas las operaciones de manera segura y se eviten problemas como cuentas con fondos insuficientes o transferencias parciales.
+
+Las transacciones son un mecanismo 
+importante para garantizar la integridad de los datos en 
+una base de datos, especialmente en situaciones que involucran múltiples operaciones que deben realizarse como una única unidad lógica.
+
+## transacciones en SQL
+
+Por supuesto, aquí tienes un ejemplo de cómo utilizar transacciones en SQL:
+
+Supongamos que tenemos dos tablas en nuestra base de datos: "usuarios" y "pagos". Queremos realizar una operación en ambas tablas, asegurándonos de que si algo falla en el proceso, se reviertan todos los cambios realizados en ambas tablas. Para esto, utilizamos transacciones.
+
+En SQL, las transacciones se utilizan para agrupar un conjunto de operaciones en una sola unidad lógica. Se inicia la transacción con la sentencia "BEGIN TRANSACTION", se ejecutan las operaciones necesarias y se finaliza con la sentencia "COMMIT" si todo ha ido bien, o con la sentencia "ROLLBACK" si algo ha fallado.
+
+Por ejemplo, supongamos que queremos insertar un nuevo usuario y realizar un pago en la base de datos:
+
+```
+BEGIN TRANSACTION;
+
+INSERT INTO usuarios (nombre, email) VALUES ('Juan', 'juan@gmail.com');
+INSERT INTO pagos (usuario_id, cantidad) VALUES (1, 50);
+
+COMMIT;
+```
+
+En este ejemplo, se inicia una transacción con la sentencia "BEGIN TRANSACTION". A continuación, se inserta un nuevo usuario en la tabla "usuarios" y un nuevo registro de pago en la tabla "pagos". Si todo ha ido bien, se confirman los cambios con la sentencia "COMMIT". Si algo ha fallado, se deshacen todos los cambios realizados en la transacción con la sentencia "ROLLBACK".
+
+Es importante destacar que las transacciones se utilizan 
+para asegurar que todas las operaciones realizadas en una 
+unidad lógica se completen correctamente o se deshagan todas juntas 
+si algo sale mal. Esto ayuda a mantener la 
+integridad de los datos y evitar problemas de inconsistencia en la 
+base de datos.
+
+## Transacciones en Eloquent
+
+En Eloquent también es posible trabajar con transacciones. Para iniciar una transacción, podemos utilizar el método `beginTransaction()` del objeto `DB`. Luego, dentro de la transacción, podemos realizar varias operaciones de escritura en la base de datos, y al finalizar, podemos confirmar los cambios con el método `commit()` o revertirlos con el método `rollback()` si algo sale mal.
+
+Aquí hay un ejemplo de cómo se podría utilizar una transacción en Eloquent:
+
+```
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
+
+DB::beginTransaction();
+
+try {
+    // Crear un nuevo usuario
+    $user = new User;
+    $user->name = 'John Doe';
+    $user->email = 'johndoe@example.com';
+    $user->password = bcrypt('password123');
+    $user->save();
+
+    // Actualizar el correo electrónico de otro usuario existente
+    $otherUser = User::find(2);
+    $otherUser->email = 'newemail@example.com';
+    $otherUser->save();
+
+    // Commit de los cambios
+    DB::commit();
+} catch (\Exception $e) {
+    // Si algo sale mal, hacer rollback
+    DB::rollback();
+}
+```
+
+En este ejemplo, se inicia una transacción con `DB::beginTransaction()` y se crean y actualizan algunos usuarios dentro de la transacción. Si algo sale mal (por ejemplo, una excepción), se hace un rollback para deshacer los cambios. Si todo funciona correctamente, se confirman los cambios con `DB::commit()`.

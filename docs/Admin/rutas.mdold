@@ -1,0 +1,111 @@
+---
+sidebar_position: 10
+---
+# Configuración de rutas
+
+:::info Objetivo
+Hasta el momento, solo hemos utilizado nuestras rutas definidas en el archivo **/routes/api.php**. Nuestras aplicaciones Laravel disponen de dos archivos de rutas por defecto: **api.php** y **web.php**. **Api.php** se utiliza para definir las rutas de nuestra **API**, mientras que **web.php** se utiliza para el resto de las rutas que apunten a páginas web. Para nuestras vistas de administración, vamos a crear un nuevo archivo de rutas llamado **admin.php**. Aunque podríamos añadir estas rutas en el archivo **web.php**, he preferido separarlas en este nuevo archivo para mayor claridad.
+:::
+
+## Admin.php
+
+Vamos a empezar configurando nuestro nuevo archivo de rutas, cree el archivo **routes/Admin.php** y copie y pegue el siguiente código:
+
+```js
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return '<h1>Bienvenido a nuestro panel de administración</h1>';
+})->name('admin.home');
+```
+
+Este es un primer paso, con la definición de este archivo Laravel no creara las rutas asociadas a este archivo automaticement, debemos incluir este archivo en el archivo **app\Providers\RouteServiceProvider.php**, para ello edite y escriba el siguiente código:
+
+```js
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
+
+class RouteServiceProvider extends ServiceProvider
+{
+    /**
+     * The path to your application's "home" route.
+     *
+     * Typically, users are redirected here after authentication.
+     *
+     * @var string
+     */
+    public const HOME = '/';
+
+    /**
+     * Define your route model bindings, pattern filters, and other route configuration.
+     */
+    public function boot(): void
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        $this->routes(function () {
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/api.php'));
+
+            Route::middleware('web')
+                ->group(base_path('routes/web.php'));
+
+            Route::middleware(['web', 'auth:sanctum'])
+                ->prefix('admin')
+                ->group(base_path('routes/admin.php'));
+        });
+    }
+}
+```
+
+Hemos introducido dos modificaciones en el presente código:
+
+1. Hemos cambiado la línea:
+
+```js
+public const HOME = '/dashboard';
+```
+por:
+```js
+public const HOME = '/';
+```
+Esto le indica a Laravel que la vista de la ruta raiz no va ser **dashboardÇ** a la cual siempre nos redirigía nuestra ruta raiz.
+
+2. Hemos añadido las siguientes lineas de código:
+
+```js
+Route::middleware(['web', 'auth:sanctum'])
+      ->prefix('admin')
+      ->group(base_path('routes/admin.php'));
+```
+:::info explicación
+1. **`Route::middleware(['web', 'auth:sanctum'])`:**
+   - `Route::middleware` se utiliza para aplicar middleware a un grupo de rutas. El middleware es un mecanismo que se ejecuta antes de que una solicitud llegue a la ruta principal. En este caso, se están aplicando dos middleware: `'web'` y `'auth:sanctum'`.
+
+   - `'web'` es un middleware común en Laravel que proporciona funcionalidades básicas de la aplicación web.
+   
+   - `'auth:sanctum'` es un middleware de autenticación. En este caso, se está utilizando Sanctum, que es una biblioteca de Laravel para autenticación mediante tokens.
+
+2. **`->prefix('admin')`:**
+   - `->prefix('admin')` establece un prefijo para todas las rutas dentro de este grupo. En este caso, todas las rutas que se definan dentro de este grupo tendrán el prefijo `'admin'`. Por ejemplo, si tienes una ruta llamada `'dashboard'`, la URL real sería `'admin/dashboard'`.
+
+3. **`->group(base_path('routes/admin.php'))`:**
+   - `->group(...)` agrupa varias rutas juntas. En este caso, se está indicando que todas las rutas definidas en el archivo `admin.php` dentro del directorio `routes` se agruparán con las características definidas anteriormente.
+
+   - `base_path('routes/admin.php')` se utiliza para obtener la ruta completa del archivo `admin.php`. Esto permite que Laravel incluya todas las rutas definidas en ese archivo dentro del grupo.
+
+En conclusión, el código que proporcionaste establece un grupo de rutas con un middleware de autenticación (`'auth:sanctum'`) y un middleware web básico (`'web'`). Todas estas rutas tienen un prefijo `'admin'` en su URL y están definidas en el archivo `admin.php` ubicado en el directorio `routes`. Esto es comúnmente utilizado para definir rutas relacionadas con la administración o el panel de control de una aplicación Laravel.
+:::

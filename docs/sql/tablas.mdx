@@ -1,0 +1,131 @@
+---
+sidebar_position: 7
+---
+
+# Definición de modelos y tablas
+
+## ¿Qué son los modelos y que son las tablas?
+
+En Laravel, los modelos son clases PHP que representan una tabla en la base de datos. Cada modelo define una serie de propiedades y métodos que corresponden a las columnas y operaciones en la tabla. Por ejemplo, si tenemos una tabla "users" en nuestra base de datos, podemos definir un modelo llamado "User" que represente esa tabla.
+
+Para definir un modelo en Laravel, creamos una nueva clase en el directorio "app/Models" y la hacemos extender de la clase base "Illuminate\Database\Eloquent\Model". Dentro de la clase, definimos una propiedad protegida llamada "$table" que indica el nombre de la tabla correspondiente en la base de datos. A partir de ahí, podemos definir propiedades para cada columna en la tabla, utilizando métodos de acceso como "get" y "set" para interactuar con ellas.
+
+Por otro lado, las tablas en Laravel son estructuras de datos en la base de datos que contienen información organizada en filas y columnas. Cada columna representa una propiedad de la entidad que se está almacenando, mientras que cada fila representa una instancia de esa entidad. Las tablas en Laravel suelen definirse mediante migraciones, que son clases PHP que contienen instrucciones para crear o modificar tablas en la base de datos.
+
+Para crear una migración en Laravel, podemos utilizar el comando "php artisan make:migration" y proporcionar un nombre descriptivo para la migración. Dentro de la clase de migración generada, podemos utilizar métodos como "create" o "table" para definir la estructura de la tabla, incluyendo nombres de columnas, tipos de datos, restricciones y otros detalles. Luego, podemos ejecutar la migración utilizando el comando "php artisan migrate", que aplica todas las migraciones pendientes en la base de datos.
+
+Los modelos en Laravel son clases PHP que representan una tabla en la base de datos, mientras que las tablas son estructuras de datos en la base de datos que contienen información organizada en filas y columnas. Los modelos se definen en el directorio "app/Models" y se extienden de la clase base "Illuminate\Database\Eloquent\Model", mientras que las tablas se definen mediante migraciones, que son clases PHP que contienen instrucciones para crear o modificar tablas en la base de datos.
+
+## ¿Cómo se define una tabla en SQL?
+
+En SQL, una tabla es una estructura de datos que se utiliza para almacenar información de manera organizada en filas y columnas. Cada columna representa una propiedad de la entidad que se está almacenando, mientras que cada fila representa una instancia de esa entidad.
+
+Para definir una tabla en SQL, utilizamos la sentencia "CREATE TABLE", seguida del nombre de la tabla y la lista de columnas con sus tipos de datos y restricciones correspondientes. Por ejemplo, podemos definir una tabla de usuarios con una columna para el nombre, una para el correo electrónico y una para la contraseña, de la siguiente manera:
+
+```
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+```
+
+En este ejemplo, la tabla "users" se define con cuatro columnas: "id", "name", "email" y "password". La columna "id" se define como una clave primaria, con un valor que se incrementa automáticamente con cada nueva fila. La columna "name" se define como un texto de hasta 255 caracteres que no puede ser nulo. La columna "email" se define como un texto de hasta 255 caracteres que debe ser único y no puede ser nulo. La columna "password" se define como un texto de hasta 255 caracteres que no puede ser nulo.
+
+Una vez que hemos definido la tabla en SQL, podemos crearla en una base de datos relacional utilizando un cliente de bases de datos como MySQL, PostgreSQL o Microsoft SQL Server. Para crear la tabla, simplemente ejecutamos la sentencia "CREATE TABLE" en el cliente de bases de datos y la tabla se agregará a la base de datos correspondiente.
+
+Es importante tener en cuenta que la sintaxis y las opciones disponibles para definir tablas pueden variar ligeramente entre los distintos sistemas de bases de datos. Sin embargo, en general, la idea básica es la misma: definimos una estructura de datos con columnas y restricciones, y luego la creamos en la base de datos utilizando una sentencia "CREATE TABLE".
+
+## Modelo User
+
+En Laravel, podemos definir una tabla utilizando un modelo. Un modelo es una clase de PHP que representa una tabla en la base de datos. Para definir un modelo en Laravel, creamos una clase que herede de la clase `Illuminate\Database\Eloquent\Model` y luego definimos sus propiedades y métodos.
+
+Por ejemplo, para definir un modelo para la tabla "users", podemos crear una clase `User` en el archivo `app/Models/User.php`, de la siguiente manera:
+
+```
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
+{
+    protected $table = 'users';
+    protected $fillable = ['name', 'email', 'password'];
+}
+```
+
+En este ejemplo, la clase `User` hereda de la clase `Model` y define tres propiedades:
+
+- `$table`: Esta propiedad especifica el nombre de la tabla en la base de datos que corresponde a este modelo. En este caso, la tabla se llama "users".
+- `$fillable`: Esta propiedad especifica qué columnas de la tabla pueden ser asignadas en masa. En este caso, las columnas "name", "email" y "password" pueden ser asignadas en masa.
+
+Con este modelo definido, podemos utilizar la clase `User` para interactuar con la tabla "users" en la base de datos. Por ejemplo, podemos crear una nueva fila en la tabla de la siguiente manera:
+
+```
+$user = new User;
+$user->name = 'John';
+$user->email = 'john@example.com';
+$user->password = bcrypt('password');
+$user->save();
+```
+
+En este ejemplo, creamos una nueva instancia de la clase `User` y asignamos sus propiedades "name", "email" y "password". Luego llamamos al método `save()` para guardar la instancia en la base de datos. Laravel se encarga de generar la sentencia SQL necesaria para insertar la fila correspondiente en la tabla "users".
+
+Es importante destacar que Laravel utiliza una convención de 
+nomenclatura para las tablas y modelos. Por defecto, si un modelo se 
+llama `User`, Laravel asumirá que la tabla correspondiente se 
+llama "users". Sin embargo, podemos cambiar esta convención si
+es necesario, utilizando la propiedad `$table` del modelo.
+
+## Diferencias y similitudes entre Eloquent y SQL
+
+Tanto SQL como Eloquent permiten definir la estructura de una tabla, pero hay algunas diferencias en la forma en que se hacen.
+
+En SQL, se define una tabla mediante una consulta CREATE TABLE, que incluye el nombre de la tabla, los nombres y tipos de datos de las columnas, así como restricciones y claves externas. La sintaxis puede variar ligeramente entre los diferentes sistemas de bases de datos, pero en general se parece a esto:
+
+```sql
+CREATE TABLE tabla_ejemplo (
+  id INT PRIMARY KEY,
+  nombre VARCHAR(255),
+  fecha_nacimiento DATE
+);
+```
+
+Por otro lado, en Eloquent, la definición de la tabla se realiza a través de la creación de una migración. Las migraciones de Laravel son clases de PHP que se encargan de modificar la estructura de la base de datos. A través de las migraciones, se pueden crear tablas, añadir o eliminar columnas, definir claves primarias y foráneas, entre otras cosas.
+
+La definición de la tabla en Eloquent se realiza a través del método `create` de la clase `Blueprint`. A continuación, se muestra un ejemplo de una migración que crea la misma tabla del ejemplo anterior:
+
+```php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CrearTablaEjemplo extends Migration
+{
+    public function up()
+    {
+        Schema::create('tabla_ejemplo', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre', 255);
+            $table->date('fecha_nacimiento');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('tabla_ejemplo');
+    }
+}
+```
+
+Como se puede ver, la sintaxis de Eloquent es un poco diferente a la de SQL. En lugar de especificar explícitamente el tipo de dato, se utilizan métodos como `string` o `date` para indicar el tipo de columna. Además, Eloquent utiliza convenciones de nomenclatura para los nombres de las columnas, por lo que la columna de clave primaria se llama `id` en lugar de `id INT PRIMARY KEY`.
+
+En conclusión, tanto SQL como Eloquent permiten definir la estructura de 
+una tabla, pero la sintaxis y los métodos utilizados pueden variar 
+ligeramente entre los diferentes sistemas de bases de datos y 
+los ORMs. Es importante conocer las diferencias y similitudes para poder 
+trabajar eficazmente con ambas herramientas.
+
