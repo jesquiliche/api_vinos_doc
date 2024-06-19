@@ -66,7 +66,7 @@ const config = {
       // Replace with your project's social card
       image: 'assets/images/logo.jpeg',
       navbar: {
-        title: 'Juntos: Laravel & Next.js',
+        title: 'Como crear una API en Laravel 11',
         logo: {
           alt: 'My Site Logo',
           src: 'assets/images/logo.jpeg',
