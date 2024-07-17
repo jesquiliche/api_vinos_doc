@@ -79,7 +79,7 @@ const config = {
             label: 'Tutorial',
           },
           {
-            href: 'https://github.com/jesquiliche/laravel_birras',
+            href: 'https://github.com/jesquiliche/api_sanctum_vinos',
             label: 'GitHub',
             position: 'right',
           },
@@ -104,7 +104,7 @@ const config = {
             items: [
                            {
                 label: 'GitHub',
-                href: 'https://github.com/jesquiliche/laravel_birras',
+                href: 'https://github.com/jesquiliche/api_sanctum_vinos',
               },
             ],
           },
