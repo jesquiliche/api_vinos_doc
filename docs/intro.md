@@ -68,8 +68,8 @@ En resumen, Laravel ofrece una solución completa y fácil de usar para crear AP
 
 :::tip Requisitos:
 
-- **PHP:** Laravel 10 requiere PHP versión 8.2 o superior.
-- **Servidor web:** Laravel 10 requiere un servidor web compatible con PHP, como Apache o Nginx.
+- **PHP:** Laravel 11 requiere PHP versión 8.2 o superior.
+- **Servidor web:** Laravel 11 requiere un servidor web compatible con PHP, como Apache o Nginx.
 - **Base de datos:** Laravel 11 soporta diversas bases de datos, incluyendo MySQL, PostgreSQL, SQLite y SQL Server.
 - **Composer:** Laravel 11 utiliza Composer como su gestor de paquetes, por lo que es necesario tenerlo instalado en el sistema.
 - **Extensiones PHP:** Laravel 10 requiere algunas extensiones PHP habilitadas, incluyendo OpenSSL, PDO, Mbstring y Tokenizer.
