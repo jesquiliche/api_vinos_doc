@@ -11,7 +11,7 @@ Para instalar **Laravel 11**, necesitará tener **PHP** y un gestor de paquetes 
 Existen dos métodos para instalar Laravel
 
 :::tip Instalación local vs global
-La diferencia entre una instalación global y una local de Laravel 10 radica en dónde se encuentra disponible el comando Laravel para su uso.
+La diferencia entre una instalación global y una local de Laravel 11 radica en dónde se encuentra disponible el comando Laravel para su uso.
 
 Una instalación global de Laravel significa que el comando Laravel está disponible en cualquier ubicación en tu sistema, lo que te permite crear nuevos proyectos de Laravel y ejecutar comandos de Laravel desde cualquier directorio.
 
@@ -71,7 +71,7 @@ php artisan serve
 ```
 Esto debería iniciar un servidor local y abrir Laravel en su navegador en la dirección http://localhost:8000.
 
-Ahora está listo para comenzar a desarrollar su aplicación con Laravel 10.
+Ahora está listo para comenzar a desarrollar su aplicación con Laravel 11.
 
 ## Estructura del proyecto
 
@@ -105,7 +105,7 @@ Esta es una descripción general de la estructura de un proyecto Laravel. Cada p
 
 ### Configuración de idioma
 
-Los mensajes de validación de Laravel pueden ser traducidos a varios idiomas entre ellos el Español.  En la versión actual de Laravel 10 por defecto no viene el directorio **“/lang”**, para poder personalizar los idiomas en Laravel como el Español por ejemplo. Vamos a ver como llevar esta tarea a cabo. 
+Los mensajes de validación de Laravel pueden ser traducidos a varios idiomas entre ellos el Español.  En la versión actual de Laravel 11 por defecto no viene el directorio **“/lang”**, para poder personalizar los idiomas en Laravel como el Español por ejemplo. Vamos a ver como llevar esta tarea a cabo. 
 
 - Desde su terminal teclee y ejecute el siguiente comando:
 
