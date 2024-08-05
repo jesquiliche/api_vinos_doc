@@ -349,7 +349,7 @@ class TipoResource extends ModelResource
 ```
 :::info Explicación
 
-Claro, aquí tienes una explicación detallada del código que has proporcionado para el recurso `Tipo` en MoonShine:
+Aquí tienes una explicación detallada del código que has proporcionado para el recurso `Tipo` en MoonShine:
 
 ### Explicación General
 

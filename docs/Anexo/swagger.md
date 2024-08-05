@@ -741,7 +741,7 @@ class TipoController extends Controller
 ```
 
 :::info explicación
-Claro, aquí tienes la explicación de la documentación del controlador `TipoController` utilizando anotaciones de OpenAPI (Swagger):
+Aquí tienes la explicación de la documentación del controlador `TipoController` utilizando anotaciones de OpenAPI (Swagger):
 
 ### Métodos del Controlador `TipoController`
 
